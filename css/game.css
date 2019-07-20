@@ -1,277 +1,188 @@
+.ad-b {
+    grid-area: ad-b;
+    width: 728px;
+    height: 90px;
+    background-color: hotpink; /* TODO: remove */
+}
+.ad-b-1 {
+    grid-area: ad-b-1;
+    width: 320px;
+    height: 100px;
+    display: none;
+    background-color: green; /* TODO: remove */
+}
+.ad-b-2 {
+    grid-area: ad-b-2;
+    width: 320px;
+    height: 100px;
+    display: none;
+    background-color: yellow; /* TODO: remove */
+}
+.ad-r {
+    grid-area: ad-r;
+    width: 300px;
+    height: 600px;
+    background-color: fuchsia; /* TODO: remove */
+}
+.ad-r-1 {
+    grid-area: ad-r-1;
+    width: 300px;
+    height: 250px;
+    background-color: cornflowerblue; /* TODO: remove */
+}
+.ad-r-2 {
+    grid-area: ad-r-2;
+    width: 300px;
+    height: 250px;
+    display: none;
+    background-color: chocolate; /* TODO: remove */
+}
+
+
+/*.container:after { content: 'layout default'; position: absolute; top: 0; bottom: 0; left: 0; right: 0; }*/
 .container {
-    height: 100vh;
-    width: 50vw;
-    background-color: lightgrey;
-}
-
-.item {
-    position: absolute;
-    height: 3rem;
-    width: 3rem;
-    z-index: 1;
-    text-align: center;
-    line-height: 3rem;
-}
-.item > .rock {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    display: grid;
+    /*grid-gap: 5px;*/
+    grid-template-rows: auto auto 90px;
+    grid-template-columns: auto 300px;
+    grid-template-areas:
+            'game-area ad-r-1'
+            'game-area ad-r'
+            'ad-b ad-r';
     height: 100%;
+    justify-items: center;
+}
+
+.game-area {
+    grid-area: game-area;
     width: 100%;
-    background-color: green;
-    -webkit-animation: rotation 30s infinite linear;
-    z-index: -1;
+    height: 100%;
+    background-color: cadetblue; /* TODO: remove */
 }
 
-@-webkit-keyframes rotation {
-    from {
-        -webkit-transform: rotate(0deg);
+@media (max-width: 640px) {
+    /*.container:after { content: 'layout 1'; position: absolute; top: 0; bottom: 0; left: 0; right: 0; }*/
+    .container {
+        grid-template-columns: auto;
+        grid-template-rows: auto 100px;
+        grid-template-areas:
+                'game-area'
+                'ad-b-1';
     }
-    to {
-        -webkit-transform: rotate(359deg);
+    .ad-b-1 {
+        display: block;
     }
-}
-
-
-
-
-
-@-webkit-keyframes travel {
-    from { left: 0;     }
-    to   { left: 640px; }
-}
-@-webkit-keyframes travel-r {
-    from { left: 640px;     }
-    to   { left: 0; }
-}
-
-@-webkit-keyframes bounce {
-    from, to  {
-        bottom: 0;
-        -webkit-animation-timing-function: ease-out;
-    }
-    50% {
-        bottom: 220px;
-        -webkit-animation-timing-function: ease-in;
-    }
-}
-@-webkit-keyframes bounce-r {
-    from, to  {
-        bottom: 220px;
-        -webkit-animation-timing-function: ease-out;
-    }
-    50% {
-        bottom: 0;
-        -webkit-animation-timing-function: ease-in;
+    .ad-r,
+    .ad-r-1,
+    .ad-r-2,
+    .ad-b,
+    .ad-b-2 {
+        display: none;
     }
 }
 
-@-webkit-keyframes spin {
-    from {                                     }
-    to   { -webkit-transform: rotateZ(360deg); }
-}
-
-/* keyframes definition for other browsers */
-
-@keyframes travel {
-    from { left: 0;     }
-    to   { left: 640px; }
-}
-@keyframes travel-r {
-    from { left: 640px;     }
-    to   { left: 0; }
-}
-
-@keyframes bounce {
-    from, to  {
-        bottom: 0;
-        animation-timing-function: ease-out;
+@media (min-width: 640px) and (max-width: 728px) {
+    /*.container:after { content: 'layout 2'; position: absolute; top: 0; bottom: 0; left: 0; right: 0; }*/
+    .container {
+        grid-template-columns: auto auto;
+        grid-template-rows: auto 100px;
+        grid-template-areas:
+                'game-area game-area'
+                'ad-b-1 ad-b-2';
     }
-    50% {
-        bottom: 220px;
-        animation-timing-function: ease-in;
+    .ad-b-1,
+    .ad-b-2 {
+        display: block;
     }
-}
-@keyframes bounce-r {
-    from, to  {
-        bottom: 220px;
-        animation-timing-function: ease-out;
-    }
-    50% {
-        bottom: 0;
-        animation-timing-function: ease-in;
+    .ad-r,
+    .ad-r-1,
+    .ad-r-2,
+    .ad-b {
+        display: none;
     }
 }
 
-@keyframes spin {
-    from {
-        -moz-transform: rotate(0);
-        -o-transform: rotate(0);
-        -ms-transform: rotate(0);
-        transform: rotate(0);
+@media (min-width: 728px) and (max-width: 1028px), (min-width: 728px) and (max-height: 250px) {
+    /*.container:after { content: 'layout 3'; position: absolute; top: 0; bottom: 0; left: 0; right: 0; }*/
+    .container {
+        grid-template-columns: auto;
+        grid-template-rows: auto 90px;
+        grid-template-areas:
+                'game-area'
+                'ad-b';
     }
-    to {
-        -moz-transform: rotate(360deg);
-        -o-transform: rotate(360deg);
-        -ms-transform: rotate(360deg);
-        transform: rotate(360deg);
+    .ad-b {
+        display: block;
+    }
+    .ad-r,
+    .ad-r-1,
+    .ad-r-2,
+    .ad-b-1,
+    .ad-b-2 {
+        display: none;
     }
 }
 
-/* styles for the stage and animated elements */
-
-#stage {
-    position: relative;
-    margin: 1em auto;
-    width: 660px;
-    height: 240px;
-    border: 2px solid #666;
-    background: #cff;
+@media (min-width: 1028px) and (min-height: 600px) and (max-height: 850px) {
+    /*.container:after { content: 'layout 4'; position: absolute; top: 0; bottom: 0; left: 0; right: 0; }*/
+    .container {
+        grid-template-rows: auto 90px;
+        grid-template-columns: auto 300px;
+        grid-template-areas:
+                'game-area ad-r'
+                'ad-b ad-r';
+    }
+    .ad-b,
+    .ad-r {
+        display: block;
+    }
+    .ad-r-1,
+    .ad-r-2,
+    .ad-b-1,
+    .ad-b-2 {
+        display: none;
+    }
 }
 
-.traveler {
-    position: absolute;
-    width: 20px;
-    height: 240px;
-
-    /*-webkit-animation-name: travel;*/
-    -webkit-animation-timing-function: linear;
-    -webkit-animation-iteration-count: infinite;
-    -webkit-animation-direction: alternate;
-    /*-webkit-animation-duration: 7s;*/
-
-    /*animation-name: travel;*/
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
-    /*animation-duration: 7s;*/
-}
-.traveler-n {
-    -webkit-animation-name: travel;
-    animation-name: travel;
-}
-.traveler-r {
-    -webkit-animation-name: travel-r;
-    animation-name: travel-r;
+@media (min-width: 1028px) and (min-height: 500px) and (max-height: 600px) {
+    /*.container:after { content: 'layout 6'; position: absolute; top: 0; bottom: 0; left: 0; right: 0; }*/
+    .container {
+        grid-template-rows: auto auto 90px;
+        grid-template-columns: auto 300px;
+        grid-template-areas:
+                'game-area ad-r-1'
+                'game-area ad-r-2'
+                'ad-b ad-r-2';
+    }
+    .ad-b,
+    .ad-r-1,
+    .ad-r-2 {
+        display: block;
+    }
+    .ad-r,
+    .ad-b-1,
+    .ad-b-2 {
+        display: none;
+    }
 }
 
-.bouncer {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border-radius: 10px;
-    background: red;
-    background: -webkit-radial-gradient(60% 40%, circle, rgba(255,255,255,0.8), red 50%) red;
-    background: -moz-radial-gradient(60% 40%, circle, rgba(255,255,255,0.8), red 50%) red;
-    background: -o-radial-gradient(60% 40%, circle, rgba(255,255,255,0.8), red 50%) red;
-    background: -ms-radial-gradient(60% 40%, circle, rgba(255,255,255,0.8), red 50%) red;
-    background: radial-gradient(60% 40%, circle, rgba(255,255,255,0.8), red 50%) red;
-
-    /*-webkit-animation-name: bounce, spin;*/
-    -webkit-animation-iteration-count: infinite;
-    /*-webkit-animation-duration: 11s;*/
-
-    /*animation-name: bounce, spin;*/
-    animation-iteration-count: infinite;
-    /*animation-duration: 11s;*/
-}
-.bouncer-n {
-    -webkit-animation-name: bounce, spin;
-    animation-name: bounce, spin;
-}
-.bouncer-r {
-    -webkit-animation-name: bounce-r, spin;
-    animation-name: bounce-r, spin;
-}
-
-.traveler0 {
-    -webkit-animation-duration: 7s;
-    animation-duration: 7s;
-}
-.bouncer0 {
-    -webkit-animation-duration: 11s;
-    animation-duration: 11s;
-}
-
-.traveler1 {
-    -webkit-animation-duration: 12s;
-    animation-duration: 12s;
-}
-.bouncer1 {
-    -webkit-animation-duration: 16s;
-    animation-duration: 16s;
-}
-
-.traveler2 {
-    -webkit-animation-duration: 17s;
-    animation-duration: 17s;
-}
-.bouncer2 {
-    -webkit-animation-duration: 21s;
-    animation-duration: 21s;
-}
-
-.traveler3 {
-    -webkit-animation-duration: 22s;
-    animation-duration: 22s;
-}
-.bouncer3 {
-    -webkit-animation-duration: 26s;
-    animation-duration: 26s;
-}
-
-.traveler4 {
-    -webkit-animation-duration: 7s;
-    animation-duration: 7s;
-}
-.bouncer4 {
-    -webkit-animation-duration: 11s;
-    animation-duration: 11s;
-}
-
-.traveler5 {
-    -webkit-animation-duration: 7s;
-    animation-duration: 7s;
-}
-.bouncer5 {
-    -webkit-animation-duration: 11s;
-    animation-duration: 11s;
-}
-
-.traveler6 {
-    -webkit-animation-duration: 7s;
-    animation-duration: 7s;
-}
-.bouncer6 {
-    -webkit-animation-duration: 11s;
-    animation-duration: 11s;
-}
-
-.traveler7 {
-    -webkit-animation-duration: 7s;
-    animation-duration: 7s;
-}
-.bouncer7 {
-    -webkit-animation-duration: 11s;
-    animation-duration: 11s;
-}
-
-.traveler8 {
-    -webkit-animation-duration: 7s;
-    animation-duration: 7s;
-}
-.bouncer8 {
-    -webkit-animation-duration: 11s;
-    animation-duration: 11s;
-}
-
-.traveler9 {
-    -webkit-animation-duration: 7s;
-    animation-duration: 7s;
-}
-.bouncer9 {
-    -webkit-animation-duration: 11s;
-    animation-duration: 11s;
+@media (min-width: 1028px) and (min-height: 250px) and (max-height: 500px) {
+    /*.container:after { content: 'layout 5'; position: absolute; top: 0; bottom: 0; left: 0; right: 0; }*/
+    .container {
+        grid-template-rows: auto 90px;
+        grid-template-columns: auto 300px;
+        grid-template-areas:
+                'game-area ad-r-1'
+                'ad-b ad-r-1';
+    }
+    .ad-b,
+    .ad-r-1 {
+        display: block;
+    }
+    .ad-r,
+    .ad-r-2,
+    .ad-b-1,
+    .ad-b-2 {
+        display: none;
+    }
 }
