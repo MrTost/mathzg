@@ -57,7 +57,7 @@
     grid-area: game-area;
     width: 100%;
     height: 100%;
-    background-color: cadetblue; /* TODO: remove */
+    /*background-color: cadetblue;*/ /* TODO: remove */
 }
 
 @media (max-width: 640px) {
