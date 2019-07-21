@@ -4,12 +4,22 @@
     <meta charset="UTF-8">
     <title>Exploring the Moon - Level 1</title>
 
+    <script src="https://kit.fontawesome.com/c8ae728a55.js"></script>
     <link href="css/common.css" rel="stylesheet"/>
     <link href="css/game.css" rel="stylesheet"/>
 </head>
 <body onresize="onResize()">
 
 <div class="container">
+
+    <div class="game-header">
+        <span class="fa-stack" id="btAudioMusic">
+            <i class="fas fa-stack-1x fa-music"></i>
+            <i class="fas fa-stack-1x fa-slash" id="btAudioMusicMuter"></i>
+        </span>
+
+        <i class="fas fa-volume-up" id="btAudioFX"></i>
+    </div>
 
     <canvas class="game-area"></canvas>
 

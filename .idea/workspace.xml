@@ -2,13 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2ee39844-63a9-4139-803c-e62527e2c1e7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/img/background.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/img/background2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/img/background3.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/img/earth.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/img/earth_mars.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/img/mars.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mp3/background.mp3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mp3/right.mp3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mp3/wrong.mp3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/css/game.css" beforeDir="false" afterPath="$PROJECT_DIR$/css/game.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game.html" beforeDir="false" afterPath="$PROJECT_DIR$/game.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/js/game.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/game.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -25,26 +24,26 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/css/game.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="66" column="39" lean-forward="true" selection-start-line="66" selection-start-column="39" selection-end-line="66" selection-end-column="39" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/game.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" column="7" selection-start-line="9" selection-start-column="7" selection-end-line="9" selection-end-column="27" />
+            <state relative-caret-position="-1516">
+              <caret line="64" column="27" selection-start-line="64" selection-start-column="27" selection-end-line="64" selection-end-column="27" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/game.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="255">
+              <caret line="17" column="70" selection-start-line="17" selection-start-column="70" selection-end-line="17" selection-end-column="70" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/js/game.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="258">
-              <caret line="244" column="57" selection-start-line="244" selection-start-column="57" selection-end-line="244" selection-end-column="57" />
+            <state relative-caret-position="738">
+              <caret line="267" column="7" selection-start-line="267" selection-start-column="7" selection-end-line="267" selection-end-column="7" />
             </state>
           </provider>
         </entry>
@@ -109,6 +108,11 @@
               <item name="mathzg" type="462c0819:PsiDirectoryNode" />
               <item name="js" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="mathzg" type="b2602c69:ProjectViewProjectNode" />
+              <item name="mathzg" type="462c0819:PsiDirectoryNode" />
+              <item name="mp3" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -131,6 +135,7 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/mp3" />
       <recent name="$PROJECT_DIR$/img" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
@@ -164,7 +169,7 @@
       <workItem from="1563458474727" duration="56000" />
       <workItem from="1563550675854" duration="3359000" />
       <workItem from="1563562179285" duration="30517000" />
-      <workItem from="1563643238591" duration="16505000" />
+      <workItem from="1563643238591" duration="23517000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <created>1563279590131</created>
@@ -194,11 +199,18 @@
       <option name="project" value="LOCAL" />
       <updated>1563603424182</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="basic game implementation">
+      <created>1563671859270</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1563671859270</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="52611000" />
+    <option name="totallyTimeSpent" value="59623000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1920" height="1008" extended-state="6" />
@@ -275,27 +287,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/game.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="7" selection-start-line="9" selection-start-column="7" selection-end-line="9" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/css/game.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="66" column="39" lean-forward="true" selection-start-line="66" selection-start-column="39" selection-end-line="66" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/img/background.png">
       <provider selected="true" editor-type-id="images" />
     </entry>
     <entry file="file://$PROJECT_DIR$/js/game.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="258">
-          <caret line="244" column="57" selection-start-line="244" selection-start-column="57" selection-end-line="244" selection-end-column="57" />
+        <state relative-caret-position="738">
+          <caret line="267" column="7" selection-start-line="267" selection-start-column="7" selection-end-line="267" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/css/game.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1516">
+          <caret line="64" column="27" selection-start-line="64" selection-start-column="27" selection-end-line="64" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/game.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="17" column="70" selection-start-line="17" selection-start-column="70" selection-end-line="17" selection-end-column="70" />
         </state>
       </provider>
     </entry>

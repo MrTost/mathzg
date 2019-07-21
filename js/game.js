@@ -24,6 +24,7 @@ function Rock(result) {
     this.y = random(0, height);
     this.velX = random(-2, 2,1);
     this.velY = random(-2, 2,1);
+    this.spin = random(-2, 2,1);
     this.color = 'rgb(' + random(0, 255) + ',' + random(0, 255) + ',' + random(0, 255) +')';
     this.size = random(rockMinSize, rockMaxSize);
 
@@ -51,9 +52,9 @@ Rock.prototype.draw = function() {
     ctx.fill();
     ctx.fillStyle = 'white';
     ctx.font = "30px monospace";
-    ctx.fillText(this.result, (this.x + 2 - this.size) + (this.id < 10 ? 9 : 0), (this.y + (this.size /2)));
-
-    //ctx.fillText(this.velX + ' '+ this.velY + ' : '/*+ this.x + ' '+ this.y*/, this.x, this.y);
+    const x = this.x - (this.size/4) - (this.result > 9 ? 10 : 0);
+    const y = this.y + (this.size/4);
+    ctx.fillText(this.result, x, y);
 };
 
 Rock.prototype.update = function() {
@@ -92,18 +93,20 @@ Rock.prototype.update = function() {
 };*/
 
 function Cursor() {
-    this.x = 0;
-    this.y = 0;
-    this.size = 20;
+    this.x = -10; // init outside canvas
+    this.y = -10;
+    this.size = 5;
 }
 Cursor.prototype.draw = function() {
-    /*ctx.beginPath();
-    ctx.fillStyle = "#FF6A6A";
+    ctx.beginPath();
+    ctx.fillStyle = "white";
     ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
     ctx.fill();
     ctx.fillStyle = 'white';
-    ctx.font = "30px monospace";*/
-    //ctx.fillText(this.x +' '+ this.y, this.x, this.y);
+    ctx.font = "30px monospace";
+
+    const pz = player.puzzles[player.puzzle];
+    ctx.fillText(`${pz.a} ${pz.sign} ${pz.b} = ?`, this.x+10, this.y+30);
 };
 
 function Puzzle(level, aMin, aMax, bMin, bMax) {
@@ -144,6 +147,8 @@ function Player() {
     this.score = 0;
     this.hits = 0;
     this.miss = 0;
+    this.playMusic = false;
+    this.playFX = true;
 }
 Player.prototype.draw = function() {
     ctx.fillStyle = 'white';
@@ -160,12 +165,12 @@ Player.prototype.draw = function() {
 };
 Player.prototype.evaluate = function(rock) {
     if (rock.result === this.puzzles[this.puzzle].r) {
-        console.log('Right answer');
+        if (this.playFX) audioRight.play();
         player.hits++;
         this.puzzles.splice(this.puzzle, 1); // remove from the array
         player.addPuzzle();
     } else {
-        console.log('WRONG');
+        if (this.playFX) audioWrong.play();
         player.miss--;
     }
 };
@@ -235,17 +240,17 @@ background.src = "img/background.png";
 earth.src = "img/earth.png";
 mars.src = "img/mars.png";
 
+const audioBackground = new Audio('mp3/background.mp3');
+const audioRight = new Audio('mp3/right.mp3');
+const audioWrong = new Audio('mp3/wrong.mp3');
+audioBackground.loop = true;
+
 function loop() {
 
     // reset the background to not show the track of the rocks
-    //ctx.fillStyle = 'black';
-    //ctx.fillRect(0, 0, width, height);
-    //background.src = "img/background.png";
     ctx.drawImage(background,0,0, width, height);
     ctx.drawImage(earth,canvas.width/1.6,canvas.height/10, 100, 100);
     ctx.drawImage(mars,canvas.width/6,canvas.height/2, 50, 50);
-
-    cursor.draw();
 
     for (const puzzle of player.puzzles) {
         puzzle.rock.draw();
@@ -253,6 +258,7 @@ function loop() {
     }
 
     player.draw();
+    cursor.draw();
 
     requestAnimationFrame(loop);
 }
@@ -262,12 +268,8 @@ player.loadLevel(1);
 loop();
 
 
-
-
-
 canvas.addEventListener('click', click);
 function click(event) {
-
     for (const puzzle of player.puzzles) {
 
         const dX = Math.abs((puzzle.rock.x - cursor.x));
@@ -302,5 +304,36 @@ function onResize() {
     for (const puzzle of player.puzzles) {
         puzzle.rock.bound();
         puzzle.rock.update();
+    }
+}
+
+const btAudioFX = document.getElementById('btAudioFX');
+btAudioFX.addEventListener('click', toggleFX);
+function toggleFX() {
+
+    player.playFX = !player.playFX;
+
+    if (player.playFX) {
+        btAudioFX.classList.add("fa-volume-up");
+        btAudioFX.classList.remove("fa-volume-mute");
+    } else {
+        btAudioFX.classList.add("fa-volume-mute");
+        btAudioFX.classList.remove("fa-volume-up");
+    }
+}
+
+const btAudioMusicMuter = document.getElementById('btAudioMusicMuter');
+const btAudioMusic = document.getElementById('btAudioMusic');
+btAudioMusic.addEventListener('click', toggleMusic);
+function toggleMusic() {
+
+    player.playMusic = !player.playMusic;
+
+    if (player.playMusic) {
+        btAudioMusicMuter.style.display="none";
+        audioBackground.play();
+    } else {
+        btAudioMusicMuter.style.display="unset";
+        audioBackground.pause();
     }
 }
