@@ -29,7 +29,7 @@ function Rock(result) {
     this.color = 'rgb(' + random(0, 255) + ',' + random(0, 255) + ',' + random(0, 255) +')';
     this.size = random(rockMinSize, rockMaxSize);
     this.image = new Image(this.size, this.size);
-    this.image.src = "img/earth.png"; // TODO: make it dynamic
+    this.image.src = `img/rock${random(1, 5)}.png`;
 
     this.bound();
 
@@ -192,16 +192,29 @@ Player.prototype.draw = function() {
     const pz = this.puzzles[this.puzzle];
     ctx.fillText(`Puzzle: ${pz.a} ${pz.sign} ${pz.b}`, 10, (20 * 6));
 };
-Player.prototype.evaluate = function(rock) {
-    if (rock.result === this.puzzles[this.puzzle].r) {
-        if (this.playFX) audioRight.play();
-        player.hits++;
-        this.puzzles.splice(this.puzzle, 1); // remove from the array
-        player.addPuzzle();
-    } else {
-        if (this.playFX) audioWrong.play();
-        player.miss--;
+Player.prototype.evaluate = function(rocks) {
+
+    if (rocks && rocks.length) {
+        let wrong = true;
+
+        for (const rock of rocks) {
+            if (rock.result === this.puzzles[this.puzzle].r) {
+                if (this.playFX) audioRight.play();
+                player.hits++;
+                this.puzzles.splice(this.puzzle, 1); // remove from the array
+                player.addPuzzle();
+                wrong = false;
+                break;
+            }
+        }
+
+        if (wrong) {
+            if (this.playFX) audioWrong.play();
+            player.miss--;
+        }
     }
+
+
 };
 Player.prototype.addPuzzle = function() {
     let pz;
@@ -299,6 +312,8 @@ loop();
 
 canvas.addEventListener('click', click);
 function click(event) {
+    const hits = [];
+
     for (const puzzle of player.puzzles) {
 
         const dX = Math.abs((puzzle.rock.x - cursor.x));
@@ -307,11 +322,11 @@ function click(event) {
 
         if (dX <= dL && dY <= dL) {
             console.log('click rock: '+ puzzle.rock.id);
-            player.evaluate(puzzle.rock);
-            break;
+            hits.push(puzzle.rock);
         }
     }
 
+    player.evaluate(hits);
 }
 
 canvas.addEventListener("mousemove", updateCursor);
