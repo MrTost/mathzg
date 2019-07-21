@@ -20,13 +20,16 @@ function Rock(result) {
     this.id = ++rockCount;
     this.result = result;
 
+    this.r = 0;
     this.x = random(0, width);
     this.y = random(0, height);
     this.velX = random(-2, 2,1);
     this.velY = random(-2, 2,1);
-    this.spin = random(-2, 2,1);
+    this.velR = random(-5, 5);
     this.color = 'rgb(' + random(0, 255) + ',' + random(0, 255) + ',' + random(0, 255) +')';
     this.size = random(rockMinSize, rockMaxSize);
+    this.image = new Image(this.size, this.size);
+    this.image.src = "img/earth.png"; // TODO: make it dynamic
 
     this.bound();
 
@@ -46,10 +49,29 @@ Rock.prototype.velFix = function(vel) {
     return (Math.abs(vel) < 0.5 ? 0.5 * Math.sign(vel) : 0);
 };
 Rock.prototype.draw = function() {
+
+    const canvasAux = document.createElement('canvas');
+    canvasAux.width = this.size*2;
+    canvasAux.height = this.size*2;
+    const ctxAux = canvasAux.getContext('2d');
+
+    // move to the center of the canvas
+    ctxAux.translate(this.size,this.size);
+
+    // rotate the canvas to the specified degrees
+    ctxAux.rotate(this.r * Math.PI / 180);
+
+    // draw the image
+    // since the context is rotated, the image will be rotated also
+    ctxAux.drawImage(this.image,-this.size,-this.size, this.size*2, this.size*2);
+
+
     ctx.beginPath();
-    ctx.fillStyle = this.color;
-    ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
-    ctx.fill();
+    //ctx.fillStyle = this.color;
+    //ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
+    //ctx.fill();
+
+    ctx.drawImage(canvasAux, this.x - this.size,this.y - this.size, this.size*2, this.size*2);
     ctx.fillStyle = 'white';
     ctx.font = "30px monospace";
     const x = this.x - (this.size/4) - (this.result > 9 ? 10 : 0);
@@ -76,6 +98,13 @@ Rock.prototype.update = function() {
 
     this.x += this.velX;
     this.y += this.velY;
+    this.r += this.velR;
+
+    if (this.r < 0) {
+        this.r = 360;
+    } else if (this.r > 360) {
+        this.r = 0;
+    }
 };
 
 /*Ball.prototype.collisionDetect = function() {
