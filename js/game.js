@@ -183,15 +183,28 @@ function Puzzle(level, aMin, aMax, bMin, bMax) {
 function Player() {
     this.name = 'John';
     this.age = '12';
+
     this.score = 0;
-    this.stats = [];
+    this.stats = []; // hits and miss for each level
+    this.puzzles = [];
+
+    // preferences
     this.playMusic = false;
     this.playFX = true;
-    this.timeTrans = 0;
 
-    this.timesup = false;
-    this.gameover = false;
+    this.reset();
 }
+
+Player.prototype.reset = function() {
+
+    this.puzzles.length = 0;
+    this.gameover = false;
+    this.time = 0;
+    this.timer = null;
+    this.timesup = false;
+
+};
+
 Player.prototype.draw = function() {
     ctx.fillStyle = 'white';
     ctx.font = "1rem monospace";
@@ -200,7 +213,7 @@ Player.prototype.draw = function() {
     ctx.fillText(`Score : ${this.score}`, 10, (20 * 2));
     ctx.fillText(`Hits  : ${this.stats[this.level-1].hits}`, 10, (20 * 3));
     ctx.fillText(`Miss  : ${this.stats[this.level-1].miss}`, 10, (20 * 4));
-    ctx.fillText(`Time  : ${this.time}`, 10, (20 * 5));
+    ctx.fillText(`Time  : ${ (this.time > 0 ? this.time : 0) }`, 10, (20 * 5));
 
     const pz = this.puzzles[this.puzzle];
     ctx.fillText(`Puzzle: ${pz.a} ${pz.sign} ${pz.b}`, 10, (20 * 6));
@@ -215,25 +228,25 @@ Player.prototype.drawTrans = function() {
     ctx.fillStyle = 'white';
     ctx.font = "3rem monospace";
 
-    if (player.timeTrans === 0) {
-        ctx.fillText('TIMES UP!', (width/2)-130, height/2);
-    } else if (player.timeTrans === 1) {
-        ctx.fillText('GET READY', (width/2)-130, height/2);
+    if (player.gameover) {
+        ctx.fillText('GAME OVER', (width/2)-130, height/2);
+
+        if (player.time < -1) {
+            ctx.font = "2rem monospace";
+            ctx.fillText('click to retry', (width/2)-135, (height/2) + 40);
+        }
+
     } else {
-        ctx.fillText(`${5 - player.timeTrans}`, (width/2)-15, height/2);
+        if (player.time === 0) {
+            ctx.fillText('TIMES UP!', (width/2)-130, height/2);
+        } else if (player.time === -1) {
+            ctx.fillText('GET READY', (width/2)-130, height/2);
+        } else {
+            ctx.fillText(`${5 + player.time}`, (width/2)-15, height/2);
+        }
     }
 
 };
-Player.prototype.drawGameOver = function() {
-    ctx.fillStyle = 'white';
-    ctx.font = "3rem monospace";
-
-    ctx.fillText('GAME OVER', (width/2)-130, height/2);
-
-    ctx.font = "2rem monospace";
-    ctx.fillText('click to retry', (width/2)-130, (height/2) + 40);
-};
-
 
 Player.prototype.evaluate = function(rocks) {
 
@@ -257,26 +270,33 @@ Player.prototype.evaluate = function(rocks) {
             this.score -= (this.score - 1 < 0 ? 0 : 1);
             this.stats[this.level-1].miss++;
 
-            const decision = random(0, 2);
-
-            rocks[0].velR = -(rocks[0].velR);
-
-            if (decision === 0) {
-                rocks[0].velX = -(rocks[0].velX);
-            } else if (decision === 1) {
-                rocks[0].velY = -(rocks[0].velY);
+            if (this.stats[this.level-1].miss >= 6) {
+                this.gameover = true;
+                this.time = 0; // game over
             } else {
-                rocks[0].velX = -(rocks[0].velX);
-                rocks[0].velY = -(rocks[0].velY);
+                const decision = random(0, 2);
+
+                rocks[0].velR = -(rocks[0].velR);
+
+                if (decision === 0) {
+                    rocks[0].velX = -(rocks[0].velX);
+                } else if (decision === 1) {
+                    rocks[0].velY = -(rocks[0].velY);
+                } else {
+                    rocks[0].velX = -(rocks[0].velX);
+                    rocks[0].velY = -(rocks[0].velY);
+                }
+
+                rocks[0].loadVel(); // change velocity for the ones with zero
             }
 
-            rocks[0].loadVel(); // change velocity for the ones with zero
         }
     }
 
-
 };
+
 Player.prototype.addPuzzle = function() {
+
     let pz;
     let isUnique;
 
@@ -298,24 +318,33 @@ Player.prototype.addPuzzle = function() {
             }
         }
 
-    } while (!isUnique);
+    } while (!isUnique); // FIXME: implement break of max try (infinite loop for finite puzzles)
 
     this.puzzles.push(pz);
     this.puzzle = random(0, this.puzzles.length - 1);
+
 };
+
 Player.prototype.loadLevel = function (level) {
+
+    clearInterval(player.timer);
+    this.reset();
     this.level = level;
-    this.gameover = false;
-    this.timesup = false;
-    this.puzzles = [];
+
+    if (this.level === 1) {
+        this.score = 0;
+        this.stats.length = 0;
+    }
+
     this.stats.push({hits: 0, miss: 0});
 
     for (let i = 0; i < qtyRocks; i++) {
         this.addPuzzle();
     }
 
-    this.time = 5; //60 + (30 * this.level); // FIXME - use the commented version
+    this.time = 60 + (30 * this.level); // FIXME - use the commented version
     this.timer = setInterval(timeManager, 1000);
+
 };
 
 const timeManager = function() {
@@ -323,28 +352,16 @@ const timeManager = function() {
     if (!paused) player.time--;
 
     if (player.time <= 0) {
-        clearInterval(player.timer);
         player.timesup = true;
 
-        if (player.level < maxLevels) {
-            player.timeTrans = 0;
-            player.timerTrans = setInterval(timeTrans, 1000);
-        } else {
-            player.timesup = false;
+        if (!player.gameover && player.level >= maxLevels) {
             player.gameover = true;
         }
     }
-};
 
-const timeTrans = function() {
-
-    if (!paused) player.timeTrans++;
-
-    if (player.timeTrans >= 5) {
-        clearInterval(player.timerTrans);
-        player.loadLevel(player.level+1);
+    if (player.time <= -5) {
+        if (!player.gameover) player.loadLevel(player.level+1);
     }
-
 };
 
 
@@ -384,8 +401,7 @@ function loop() {
 
     if (!paused && !player.timesup && !player.gameover) cursor.draw();
 
-    if (player.timesup && !paused) player.drawTrans();
-    if (player.gameover && !paused) player.drawGameOver();
+    if (!paused && (player.timesup || player.gameover)) player.drawTrans();
 
     if (!paused) {
         requestAnimationFrame(loop);
@@ -403,7 +419,7 @@ canvas.addEventListener('click', click);
 function click(event) {
 
     if (player.gameover) {
-        player.loadLevel(1);
+        if (player.time < -1) player.loadLevel(1);
     } else if (!player.timesup) {
         const hits = [];
 
@@ -434,16 +450,6 @@ function updateCursor(e) {
 
     cursor.x = e.clientX * scaleX;
     cursor.y = e.clientY * scaleY;
-}
-
-function onResize() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-
-    for (const puzzle of player.puzzles) {
-        puzzle.rock.bound();
-        puzzle.rock.update();
-    }
 }
 
 // Pause controller
@@ -496,5 +502,15 @@ function toggleMusic() {
     } else {
         btAudioMusicMuter.style.display="unset";
         audioBackground.pause();
+    }
+}
+
+function onResize() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+
+    for (const puzzle of player.puzzles) {
+        puzzle.rock.bound();
+        puzzle.rock.update();
     }
 }
