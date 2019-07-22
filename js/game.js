@@ -10,6 +10,7 @@ const ctx = canvas.getContext('2d');
 let width = canvas.width = window.innerWidth;
 let height = canvas.height = window.innerHeight;
 let rockCount = 0;
+let paused = false;
 
 function random(min, max, dec = 0) {
     const power = Math.pow(10, dec);
@@ -23,19 +24,12 @@ function Rock(result) {
     this.r = 0;
     this.x = random(0, width);
     this.y = random(0, height);
-    this.velX = random(-2, 2,1);
-    this.velY = random(-2, 2,1);
-    this.velR = random(-5, 5);
-    this.color = 'rgb(' + random(0, 255) + ',' + random(0, 255) + ',' + random(0, 255) +')';
     this.size = random(rockMinSize, rockMaxSize);
     this.image = new Image(this.size, this.size);
-    this.image.src = `img/rock${random(1, 5)}.png`;
+    this.image.src = `img/rock${random(2, 5)}.png`;
 
+    this.loadVel();
     this.bound();
-
-    // keeping minimum velocity
-    this.velX += this.velFix(this.velX);
-    this.velY += this.velFix(this.velY);
 }
 Rock.prototype.bound = function() {
     // keeping the full rock inside the canvas
@@ -43,6 +37,22 @@ Rock.prototype.bound = function() {
     this.y += (this.y <= this.size ? this.size : 0);
     this.x -= (this.x + this.size >= width ? this.size : 0);
     this.y -= (this.y + this.size >= height ? this.size : 0);
+};
+Rock.prototype.loadVel = function() {
+    if (!this.velX || this.velX === 0) {
+        this.velX = random(-2, 2,1);
+        this.velX += this.velFix(this.velX);
+    }
+
+    if (!this.velY || this.velY === 0) {
+        this.velY = random(-2, 2,1);
+        this.velY += this.velFix(this.velY);
+    }
+
+    if (!this.velR || this.velR === 0) {
+        this.velR = random(-5, 5);
+        this.velR += this.velFix(this.velR);
+    }
 };
 Rock.prototype.velFix = function(vel) {
     // keeping minimum velocity
@@ -73,7 +83,7 @@ Rock.prototype.draw = function() {
 
     ctx.drawImage(canvasAux, this.x - this.size,this.y - this.size, this.size*2, this.size*2);
     ctx.fillStyle = 'white';
-    ctx.font = "30px monospace";
+    ctx.font = "bold 30px monospace";
     const x = this.x - (this.size/4) - (this.result > 9 ? 10 : 0);
     const y = this.y + (this.size/4);
     ctx.fillText(this.result, x, y);
@@ -122,8 +132,8 @@ Rock.prototype.update = function() {
 };*/
 
 function Cursor() {
-    this.x = -10; // init outside canvas
-    this.y = -10;
+    this.x = (width/2) - 90;
+    this.y = height - 40;
     this.size = 5;
 }
 Cursor.prototype.draw = function() {
@@ -174,10 +184,13 @@ function Player() {
     this.name = 'John';
     this.age = '12';
     this.score = 0;
-    this.hits = 0;
-    this.miss = 0;
+    this.stats = [];
     this.playMusic = false;
     this.playFX = true;
+    this.timeTrans = 0;
+
+    this.timesup = false;
+    this.gameover = false;
 }
 Player.prototype.draw = function() {
     ctx.fillStyle = 'white';
@@ -185,13 +198,43 @@ Player.prototype.draw = function() {
 
     ctx.fillText(`Player: ${this.name}`, 10, 20);
     ctx.fillText(`Score : ${this.score}`, 10, (20 * 2));
-    ctx.fillText(`Hits  : ${this.hits}`, 10, (20 * 3));
-    ctx.fillText(`Miss  : ${this.miss}`, 10, (20 * 4));
+    ctx.fillText(`Hits  : ${this.stats[this.level-1].hits}`, 10, (20 * 3));
+    ctx.fillText(`Miss  : ${this.stats[this.level-1].miss}`, 10, (20 * 4));
     ctx.fillText(`Time  : ${this.time}`, 10, (20 * 5));
 
     const pz = this.puzzles[this.puzzle];
     ctx.fillText(`Puzzle: ${pz.a} ${pz.sign} ${pz.b}`, 10, (20 * 6));
 };
+Player.prototype.drawPaused = function() {
+    ctx.fillStyle = 'white';
+    ctx.font = "5rem monospace";
+    ctx.fillText('Paused', (width/2) - 145, height/2);
+};
+Player.prototype.drawTrans = function() {
+
+    ctx.fillStyle = 'white';
+    ctx.font = "3rem monospace";
+
+    if (player.timeTrans === 0) {
+        ctx.fillText('TIMES UP!', (width/2)-130, height/2);
+    } else if (player.timeTrans === 1) {
+        ctx.fillText('GET READY', (width/2)-130, height/2);
+    } else {
+        ctx.fillText(`${5 - player.timeTrans}`, (width/2)-15, height/2);
+    }
+
+};
+Player.prototype.drawGameOver = function() {
+    ctx.fillStyle = 'white';
+    ctx.font = "3rem monospace";
+
+    ctx.fillText('GAME OVER', (width/2)-130, height/2);
+
+    ctx.font = "2rem monospace";
+    ctx.fillText('click to retry', (width/2)-130, (height/2) + 40);
+};
+
+
 Player.prototype.evaluate = function(rocks) {
 
     if (rocks && rocks.length) {
@@ -200,7 +243,8 @@ Player.prototype.evaluate = function(rocks) {
         for (const rock of rocks) {
             if (rock.result === this.puzzles[this.puzzle].r) {
                 if (this.playFX) audioRight.play();
-                player.hits++;
+                this.stats[this.level-1].hits++;
+                this.score++;
                 this.puzzles.splice(this.puzzle, 1); // remove from the array
                 player.addPuzzle();
                 wrong = false;
@@ -210,7 +254,23 @@ Player.prototype.evaluate = function(rocks) {
 
         if (wrong) {
             if (this.playFX) audioWrong.play();
-            player.miss--;
+            this.score -= (this.score - 1 < 0 ? 0 : 1);
+            this.stats[this.level-1].miss++;
+
+            const decision = random(0, 2);
+
+            rocks[0].velR = -(rocks[0].velR);
+
+            if (decision === 0) {
+                rocks[0].velX = -(rocks[0].velX);
+            } else if (decision === 1) {
+                rocks[0].velY = -(rocks[0].velY);
+            } else {
+                rocks[0].velX = -(rocks[0].velX);
+                rocks[0].velY = -(rocks[0].velY);
+            }
+
+            rocks[0].loadVel(); // change velocity for the ones with zero
         }
     }
 
@@ -245,27 +305,46 @@ Player.prototype.addPuzzle = function() {
 };
 Player.prototype.loadLevel = function (level) {
     this.level = level;
+    this.gameover = false;
+    this.timesup = false;
     this.puzzles = [];
+    this.stats.push({hits: 0, miss: 0});
 
     for (let i = 0; i < qtyRocks; i++) {
         this.addPuzzle();
     }
 
-    this.time = 60 + (30 * this.level);
+    this.time = 5; //60 + (30 * this.level); // FIXME - use the commented version
     this.timer = setInterval(timeManager, 1000);
 };
 
 const timeManager = function() {
-    player.time--;
+
+    if (!paused) player.time--;
 
     if (player.time <= 0) {
         clearInterval(player.timer);
+        player.timesup = true;
 
         if (player.level < maxLevels) {
-            // TODO - implement screen of level change
-            player.loadLevel(player.level+1);
+            player.timeTrans = 0;
+            player.timerTrans = setInterval(timeTrans, 1000);
+        } else {
+            player.timesup = false;
+            player.gameover = true;
         }
     }
+};
+
+const timeTrans = function() {
+
+    if (!paused) player.timeTrans++;
+
+    if (player.timeTrans >= 5) {
+        clearInterval(player.timerTrans);
+        player.loadLevel(player.level+1);
+    }
+
 };
 
 
@@ -294,39 +373,55 @@ function loop() {
     ctx.drawImage(earth,canvas.width/1.6,canvas.height/10, 100, 100);
     ctx.drawImage(mars,canvas.width/6,canvas.height/2, 50, 50);
 
-    for (const puzzle of player.puzzles) {
-        puzzle.rock.draw();
-        puzzle.rock.update();
+    if (!paused && !player.timesup && !player.gameover) {
+        for (const puzzle of player.puzzles) {
+            puzzle.rock.draw();
+            puzzle.rock.update();
+        }
     }
 
     player.draw();
-    cursor.draw();
 
-    requestAnimationFrame(loop);
+    if (!paused && !player.timesup && !player.gameover) cursor.draw();
+
+    if (player.timesup && !paused) player.drawTrans();
+    if (player.gameover && !paused) player.drawGameOver();
+
+    if (!paused) {
+        requestAnimationFrame(loop);
+    } else {
+        player.drawPaused();
+    }
+
 }
 
 // start the game
 player.loadLevel(1);
 loop();
 
-
 canvas.addEventListener('click', click);
 function click(event) {
-    const hits = [];
 
-    for (const puzzle of player.puzzles) {
+    if (player.gameover) {
+        player.loadLevel(1);
+    } else if (!player.timesup) {
+        const hits = [];
 
-        const dX = Math.abs((puzzle.rock.x - cursor.x));
-        const dY = Math.abs((puzzle.rock.y - cursor.y));
-        const dL = (puzzle.rock.size + clickGrace);
+        for (const puzzle of player.puzzles) {
 
-        if (dX <= dL && dY <= dL) {
-            console.log('click rock: '+ puzzle.rock.id);
-            hits.push(puzzle.rock);
+            const dX = Math.abs((puzzle.rock.x - cursor.x));
+            const dY = Math.abs((puzzle.rock.y - cursor.y));
+            const dL = (puzzle.rock.size + clickGrace);
+
+            if (dX <= dL && dY <= dL) {
+                //console.log('click rock: '+ puzzle.rock.id);
+                hits.push(puzzle.rock);
+            }
         }
+
+        player.evaluate(hits);
     }
 
-    player.evaluate(hits);
 }
 
 canvas.addEventListener("mousemove", updateCursor);
@@ -351,6 +446,26 @@ function onResize() {
     }
 }
 
+// Pause controller
+
+const btPause = document.getElementById('btPause');
+btPause.addEventListener('click', togglePause);
+function togglePause() {
+
+    paused = !paused;
+
+    if (paused) {
+        btPause.classList.add("fa-play");
+        btPause.classList.remove("fa-pause");
+    } else {
+        btPause.classList.add("fa-pause");
+        btPause.classList.remove("fa-play");
+        requestAnimationFrame(loop);
+    }
+}
+
+// Sound effects controller
+
 const btAudioFX = document.getElementById('btAudioFX');
 btAudioFX.addEventListener('click', toggleFX);
 function toggleFX() {
@@ -365,6 +480,8 @@ function toggleFX() {
         btAudioFX.classList.remove("fa-volume-up");
     }
 }
+
+// Music controller
 
 const btAudioMusicMuter = document.getElementById('btAudioMusicMuter');
 const btAudioMusic = document.getElementById('btAudioMusic');
