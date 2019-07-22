@@ -31,7 +31,15 @@ function Rock(result) {
     this.loadVel();
     this.bound();
 }
-Rock.prototype.bound = function() {
+Rock.prototype.bound = function(flip = false) {
+
+    if (flip) {
+        const saveX = this.x;
+        const saveY = this.y;
+        this.x = saveY;
+        this.y = saveX;
+    }
+
     // keeping the full rock inside the canvas
     this.x += (this.x <= this.size ? this.size : 0);
     this.y += (this.y <= this.size ? this.size : 0);
@@ -135,17 +143,22 @@ function Cursor() {
     this.x = (width/2) - 90;
     this.y = height - 40;
     this.size = 5;
+    this.support = !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
-Cursor.prototype.draw = function() {
-    ctx.beginPath();
-    ctx.fillStyle = "white";
-    ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.fillStyle = 'white';
-    ctx.font = "30px monospace";
 
-    const pz = player.puzzles[player.puzzle];
-    ctx.fillText(`${pz.a} ${pz.sign} ${pz.b} = ?`, this.x+10, this.y+30);
+Cursor.prototype.draw = function() {
+
+    if (this.support) {
+        ctx.beginPath();
+        ctx.fillStyle = "white";
+        ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillStyle = 'white';
+        ctx.font = "30px monospace";
+
+        const pz = player.puzzles[player.puzzle];
+        ctx.fillText(`${pz.a} ${pz.sign} ${pz.b} = ?`, this.x+10, this.y+30);
+    }
 };
 
 function Puzzle(level, aMin, aMax, bMin, bMax) {
@@ -207,16 +220,19 @@ Player.prototype.reset = function() {
 
 Player.prototype.draw = function() {
     ctx.fillStyle = 'white';
-    ctx.font = "1rem monospace";
-
-    ctx.fillText(`Player: ${this.name}`, 10, 20);
-    ctx.fillText(`Score : ${this.score}`, 10, (20 * 2));
-    ctx.fillText(`Hits  : ${this.stats[this.level-1].hits}`, 10, (20 * 3));
-    ctx.fillText(`Miss  : ${this.stats[this.level-1].miss}`, 10, (20 * 4));
-    ctx.fillText(`Time  : ${ (this.time > 0 ? this.time : 0) }`, 10, (20 * 5));
+    ctx.font = "bold 30px arial";
 
     const pz = this.puzzles[this.puzzle];
-    ctx.fillText(`Puzzle: ${pz.a} ${pz.sign} ${pz.b}`, 10, (20 * 6));
+    ctx.fillText(`${pz.a} ${pz.sign} ${pz.b} = ?`, 10, 35);
+
+    ctx.font = "1rem monospace";
+    ctx.fillText(`Player: ${this.name}`, 10, 60);
+    ctx.fillText(`Score : ${this.score}`, 10, 80);
+    ctx.fillText(`Hits  : ${this.stats[this.level-1].hits}`, 10, 100);
+    ctx.fillText(`Miss  : ${this.stats[this.level-1].miss}`, 10, 120);
+    ctx.fillText(`Time  : ${ (this.time > 0 ? this.time : 0) }`, 10, 140);
+
+
 };
 Player.prototype.drawPaused = function() {
     ctx.fillStyle = 'white';
@@ -505,12 +521,32 @@ function toggleMusic() {
     }
 }
 
-function onResize() {
+// Resize or orientation change
+
+// Detect whether device supports orientationchange event
+/*const supportsOrientationChange = "onorientationchange" in window;
+
+if (supportsOrientationChange === 'onorientationchange') {
+    window.addEventListener('onorientationchange', function() {
+        console.log('orientation change');
+    }, false);
+}*/
+
+window.addEventListener('resize', onResizeOrOnOrientationChange, false);
+window.addEventListener('onorientationchange', onResizeOrOnOrientationChange, false);
+
+function onResizeOrOnOrientationChange() {
+
+    const oldW = width;
+    const oldH = height;
+
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
 
     for (const puzzle of player.puzzles) {
-        puzzle.rock.bound();
+        puzzle.rock.bound( (oldW === height && oldH === width) );
         puzzle.rock.update();
     }
 }
+
+
