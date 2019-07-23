@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <title>Exploring the Moon - Level 1</title>
 
+    <!--<link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">-->
     <script src="https://kit.fontawesome.com/c8ae728a55.js"></script>
     <link href="css/common.css" rel="stylesheet"/>
     <link href="css/game.css" rel="stylesheet"/>
@@ -23,6 +27,66 @@
         </span>
 
         <i class="fas fa-volume-up" id="btAudioFX"></i>
+    </div>
+
+    <div id="game-popup" class="game-popup flex-center">
+
+        <!-- START -->
+        <div id="start" class="popup-start">
+            <h1 class="game-title">Math Zero Gravity</h1>
+
+            <button class="btn btn-block btn-success btn-start" onclick="game.navigate(3)">START</button>
+            <div style="display: flex; margin-top: 0.4rem;">
+                <button class="btn btn-primary" style="flex: 1; margin-right: 0.2rem;" onclick="game.navigate(1)">RULES</button>
+                <button class="btn btn-primary" style="flex: 1; margin-left: 0.2rem;" onclick="game.navigate(2)">CREDITS</button>
+            </div>
+        </div>
+
+        <!-- RULES -->
+        <div id="rules" class="popup-rules d-none">
+            <h1 class="game-title">Rules</h1>
+
+            <div class="rule-card">
+                <h3>Level 1: Add</h3>
+                <p>Example: 8 + 2 = 10</p>
+            </div>
+
+            <div class="rule-card">
+                <h3>Level 2: Substract</h3>
+                <p>Example: 8 - 2 = 6</p>
+            </div>
+
+            <div class="rule-card">
+                <h3>Level 3: Division</h3>
+                <p>Example: 8 / 2 = 4</p>
+            </div>
+
+            <button class="btn btn-block btn-primary" style="margin-top: 1rem" onclick="game.navigate(0)">Back</button>
+        </div>
+
+        <!-- CREDITS -->
+        <div id="credits" class="popup-credits d-none">
+            <h1 class="game-title">Credits</h1>
+
+            <h3><a href="https://www.linkedin.com/in/rvpalmieri/">Rodrigo Visentini Palmieri: Dev</a></h3>
+            <h3><a href="#">Svetlana Ostrikova: Art</a></h3>
+            <h3><a href="https://freesound.org/">freesound: Sound</a></h3>
+
+            <button class="btn btn-block btn-primary" style="margin-top: 1rem" onclick="game.navigate(0)">Back</button>
+        </div>
+
+        <!-- POPUP FORM -->
+        <div id="player-select" class="popup-player-select d-none">
+            <h1 class="game-title">Player</h1>
+
+            <form>
+                <input class="form-control" type="text" placeholder="Name" id="inName">
+                <input class="form-control" type="text" placeholder="Age" id="inAge">
+            </form>
+
+            <button class="btn btn-block btn-success" style="margin-top: 1rem" onclick="game.navigate(4)">PLAY</button>
+        </div>
+
     </div>
 
     <canvas class="game-area"></canvas>
