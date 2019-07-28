@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2ee39844-63a9-4139-803c-e62527e2c1e7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/mathzg.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/mathzg.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/css/game.css" beforeDir="false" afterPath="$PROJECT_DIR$/css/game.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/game.html" beforeDir="false" afterPath="$PROJECT_DIR$/game.html" afterDir="false" />
@@ -75,7 +73,13 @@
       <workItem from="1563731911755" duration="2544000" />
       <workItem from="1563746528783" duration="17290000" />
       <workItem from="1563816087329" duration="3406000" />
-      <workItem from="1563820228202" duration="23886000" />
+      <workItem from="1563820228202" duration="24340000" />
+      <workItem from="1563976257827" duration="123000" />
+      <workItem from="1563989788709" duration="2000" />
+      <workItem from="1563999331842" duration="1563000" />
+      <workItem from="1564240339736" duration="1387000" />
+      <workItem from="1564279437249" duration="9778000" />
+      <workItem from="1564330036993" duration="9533000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <created>1563279590131</created>
@@ -154,7 +158,14 @@
       <option name="project" value="LOCAL" />
       <updated>1563820182230</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="fixing flip">
+      <created>1563855150752</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1563855150752</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -165,7 +176,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>

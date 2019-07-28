@@ -4,6 +4,12 @@ const rules = document.getElementById('rules');
 const credits = document.getElementById('credits');
 const playerSelect = document.getElementById('player-select');
 
+const nextLevel = document.getElementById('next-level');
+const nextLevelCounter = document.getElementById('next-level-counter');
+const gameOver = document.getElementById('game-over');
+const gameEnd = document.getElementById('game-end');
+const paused = document.getElementById('paused');
+
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 
@@ -36,23 +42,44 @@ function random(min, max, dec = 0) {
 function timeManager() {
     //console.log('This is the timer: ', this.paused);
 
-    if (!game.paused) game.time--;
+    if (game.status === game.PLAYING || game.status === game.NEXTLEVEL) {
+        game.time--;
 
-    if (game.time <= 0) {
-        game.timesup = true;
+        if (game.time === 0) {
+            if (game.level >= game.maxLevels) {
+                game.navigate(game.GAMEEND);
+            } else {
+                game.navigate(game.NEXTLEVEL);
+            }
+        }
 
-        if (!game.gameover && game.level >= game.maxLevels) {
-            game.gameover = true;
+        if (game.status === game.NEXTLEVEL) {
+            nextLevelCounter.innerHTML = (5 + game.time);
+
+            if (game.time <= -5) {
+                game.navigate(game.PLAYING);
+            }
         }
     }
 
-    if (game.time <= -5) {
-        if (!game.gameover) game.loadLevel(game.level+1);
-    }
 }
 
 function Game() {
-    this.status = 0; // 0 to 3 = demo mode | 4 = playing
+
+    // constants
+    this.PLAYAGAIN  = -6;
+    this.TRYAGAIN   = -5;
+    this.GAMEEND    = -4; // no rocks - when the player finishes the game alive
+    this.GAMEOVER   = -3; // no rocks - when the player exceeds the misses
+    this.NEXTLEVEL  = -2; // no rocks
+    this.PAUSED     = -1; // no rocks
+    this.PLAYING    =  0;
+    this.GAMESTART  =  1;
+    this.PLAYERNAME =  2; // form
+    this.RULES      =  3;
+    this.CREDITS    =  4;
+
+    this.status = this.GAMESTART;
 
     this.player = {
         name: null,
@@ -63,12 +90,9 @@ function Game() {
     };
 
     this.maxLevels = 3;
-    this.paused = false;
-    this.gameover = false;
 
     this.time = 0;
     this.timer = null;
-    this.timesup = false;
 
     this.score = 0;  // Score of all levels combined
     this.stats = []; // hits and miss for each level, also controls the chain of levels
@@ -88,10 +112,8 @@ function Game() {
  */
 Game.prototype.reset = function() {
     this.puzzles.length = 0; // clear the array of puzzles
-    this.gameover = false;
     this.time = 0;
     this.timer = null;
-    this.timesup = false;
 };
 
 /**
@@ -99,59 +121,188 @@ Game.prototype.reset = function() {
  * @param status pages to display [0-4]
  */
 Game.prototype.navigate = function (status) {
-  this.status = status;
 
-  if (this.status === 0) {
-      console.log('go to start');
+    let loadLevel = true;
+    if (this.status === this.PAUSED) loadLevel = false;
 
-      gamePopup.classList.remove('d-none');
-      start.classList.remove('d-none');
-      rules.classList.add('d-none');
-      credits.classList.add('d-none');
-      playerSelect.classList.add('d-none');
+    if (status === this.PLAYAGAIN) {
+        this.status = this.PLAYING;
+        this.reset();
+        this.level = 1;
+    } else if (status === this.TRYAGAIN) {
+        this.status = this.PLAYING;
+        this.reset();
+    } else {
+        this.status = status;
+    }
 
-  } else if (this.status === 1) {
-      console.log('go to rules');
+    if (this.status === this.GAMEEND) {
+        console.log('GAME END');
 
-      gamePopup.classList.remove('d-none');
-      start.classList.add('d-none');
-      rules.classList.remove('d-none');
-      credits.classList.add('d-none');
-      playerSelect.classList.add('d-none');
+        clearInterval(this.timer);
 
-  } else if (this.status === 2) {
-      console.log('go to credits');
+        gamePopup.classList.remove('d-none');
+        start.classList.add('d-none');
+        rules.classList.add('d-none');
+        credits.classList.add('d-none');
+        playerSelect.classList.add('d-none');
+        gamePopup.style.zIndex = '0';
+        nextLevel.classList.add('d-none');
+        gameOver.classList.add('d-none');
+        gameEnd.classList.remove('d-none');
+        paused.classList.add('d-none');
 
-      gamePopup.classList.remove('d-none');
-      start.classList.add('d-none');
-      rules.classList.add('d-none');
-      credits.classList.remove('d-none');
-      playerSelect.classList.add('d-none');
+        btPause.classList.add('d-none');
+        btSave.classList.add('d-none');
 
-  } else if (this.status === 3) {
-      console.log('go to player select');
+    } else if (this.status === this.GAMEOVER) {
+        console.log('GAME OVER');
 
-      gamePopup.classList.remove('d-none');
-      start.classList.add('d-none');
-      rules.classList.add('d-none');
-      credits.classList.add('d-none');
-      playerSelect.classList.remove('d-none');
+        clearInterval(this.timer);
 
-  } else if (this.status === 4) {
-      console.log('lets play!');
+        gamePopup.classList.remove('d-none');
+        start.classList.add('d-none');
+        rules.classList.add('d-none');
+        credits.classList.add('d-none');
+        playerSelect.classList.add('d-none');
+        gamePopup.style.zIndex = '0';
+        nextLevel.classList.add('d-none');
+        gameOver.classList.remove('d-none');
+        gameEnd.classList.add('d-none');
+        paused.classList.add('d-none');
 
-      gamePopup.classList.add('d-none');
-      start.classList.add('d-none');
-      rules.classList.add('d-none');
-      credits.classList.add('d-none');
-      playerSelect.classList.add('d-none');
-      gamePopup.style.zIndex = '-1';
+        btPause.classList.add('d-none');
+        btSave.classList.add('d-none');
 
-      game.loadLevel(1);
+    } else if (this.status === this.NEXTLEVEL) {
+        console.log('NEXT LEVEL');
 
-  } else {
-      console.error('option not supported: '+ this.status);
-  }
+        this.level++;
+
+        gamePopup.classList.remove('d-none');
+        start.classList.add('d-none');
+        rules.classList.add('d-none');
+        credits.classList.add('d-none');
+        playerSelect.classList.add('d-none');
+        gamePopup.style.zIndex = '0';
+        nextLevel.classList.remove('d-none');
+        gameOver.classList.add('d-none');
+        gameEnd.classList.add('d-none');
+        paused.classList.add('d-none');
+
+        btPause.classList.add('d-none');
+        btSave.classList.add('d-none');
+
+    } else if (this.status === this.PAUSED) {
+        console.log('PAUSED');
+
+        btPause.classList.add("fa-play");
+        btPause.classList.remove("fa-pause");
+
+        gamePopup.classList.remove('d-none');
+        start.classList.add('d-none');
+        rules.classList.add('d-none');
+        credits.classList.add('d-none');
+        playerSelect.classList.add('d-none');
+        gamePopup.style.zIndex = '0';
+        nextLevel.classList.add('d-none');
+        gameOver.classList.add('d-none');
+        gameEnd.classList.add('d-none');
+        paused.classList.remove('d-none');
+
+        btPause.classList.remove('d-none');
+        btSave.classList.remove('d-none');
+
+    } else if (this.status === this.PLAYING) {
+        console.log('PLAYING');
+
+        if (loadLevel) clearInterval(this.timer);
+
+        gamePopup.classList.add('d-none');
+        start.classList.add('d-none');
+        rules.classList.add('d-none');
+        credits.classList.add('d-none');
+        playerSelect.classList.add('d-none');
+        gamePopup.style.zIndex = '-1';
+        nextLevel.classList.add('d-none');
+        gameOver.classList.add('d-none');
+        gameEnd.classList.add('d-none');
+        paused.classList.add('d-none');
+
+        btPause.classList.add("fa-pause");
+        btPause.classList.remove("fa-play", "d-none");
+        btSave.classList.remove('d-none');
+
+        if (loadLevel) this.loadLevel(this.level);
+
+    } else if (this.status === this.GAMESTART) {
+        console.log('GAME START');
+
+        gamePopup.classList.remove('d-none');
+        start.classList.remove('d-none');
+        rules.classList.add('d-none');
+        credits.classList.add('d-none');
+        playerSelect.classList.add('d-none');
+        nextLevel.classList.add('d-none');
+        gameOver.classList.add('d-none');
+        gameEnd.classList.add('d-none');
+        paused.classList.add('d-none');
+
+        btPause.classList.add('d-none');
+        btSave.classList.add('d-none');
+
+    } else if (this.status === this.PLAYERNAME) {
+        console.log('PLAYER NAME');
+
+        gamePopup.classList.remove('d-none');
+        start.classList.add('d-none');
+        rules.classList.add('d-none');
+        credits.classList.add('d-none');
+        playerSelect.classList.remove('d-none');
+        nextLevel.classList.add('d-none');
+        gameOver.classList.add('d-none');
+        gameEnd.classList.add('d-none');
+        paused.classList.add('d-none');
+
+        btPause.classList.add('d-none');
+        btSave.classList.add('d-none');
+
+    } else if (this.status === this.RULES) {
+        console.log('RULES');
+
+        gamePopup.classList.remove('d-none');
+        start.classList.add('d-none');
+        rules.classList.remove('d-none');
+        credits.classList.add('d-none');
+        playerSelect.classList.add('d-none');
+        nextLevel.classList.add('d-none');
+        gameOver.classList.add('d-none');
+        gameEnd.classList.add('d-none');
+        paused.classList.add('d-none');
+
+        btPause.classList.add('d-none');
+        btSave.classList.add('d-none');
+
+    } else if (this.status === this.CREDITS) {
+        console.log('go to credits');
+
+        gamePopup.classList.remove('d-none');
+        start.classList.add('d-none');
+        rules.classList.add('d-none');
+        credits.classList.remove('d-none');
+        playerSelect.classList.add('d-none');
+        nextLevel.classList.add('d-none');
+        gameOver.classList.add('d-none');
+        gameEnd.classList.add('d-none');
+        paused.classList.add('d-none');
+
+        btPause.classList.add('d-none');
+        btSave.classList.add('d-none');
+
+    } else {
+        console.error('STATUS NOT FOUND');
+    }
+
 };
 
 /**
@@ -163,27 +314,22 @@ Game.prototype.draw = function() {
     ctx.drawImage(earth,canvas.width/1.6,canvas.height/10, 100, 100);
     ctx.drawImage(mars,canvas.width/6,canvas.height/2, 50, 50);
 
-    if (!this.paused && !this.timesup && !this.gameover) {
+    if (this.status >= this.PLAYING) {
         for (const puzzle of this.puzzles) {
             puzzle.rock.draw();
             puzzle.rock.update(this.width, this.height);
         }
     }
 
-    if (this.status === 4) this.drawStats();
-
-    if (this.status === 4 && !this.paused && !this.timesup && !this.gameover) this.cursor.draw();
-
-    if (!this.paused && (this.timesup || this.gameover)) this.drawTrans();
-
-    if (!this.paused) {
-        //requestAnimationFrame(this.draw.bind(this));
-        requestAnimationFrame( function () {
-            game.draw();
-        });
-    } else {
-        this.drawPaused();
+    if (this.status === this.PLAYING) {
+        this.drawStats();
+        this.cursor.draw();
     }
+
+    //requestAnimationFrame(this.draw.bind(this));
+    requestAnimationFrame( function () {
+        game.draw();
+    });
 };
 
 /**
@@ -195,38 +341,38 @@ Game.prototype.drawStats = function() {
 
     if (this.puzzle >= 0 && this.puzzles && this.puzzles.length) {
         const pz = this.puzzles[this.puzzle];
-        ctx.fillText(`${pz.a} ${pz.sign} ${pz.b} = ?`, 10, 35);
+        ctx.fillText(`${pz.a} ${pz.sign} ${pz.b} = ?`, 10, 35+40);
     } else {
         console.error('Puzzle or Puzzles are missing');
     }
 
     ctx.font = "1rem monospace";
-    ctx.fillText(`Player: ${this.player.name}`, 10, 60);
-    ctx.fillText(`Score : ${this.score}`, 10, 80);
+    ctx.fillText(`Player: ${this.player.name}`, 10, 60+40);
+    ctx.fillText(`Score : ${this.score}`, 10, 80+40);
 
     if (this.level && this.stats && this.stats.length) {
-        ctx.fillText(`Hits  : ${this.stats[this.level-1].hits}`, 10, 100);
-        ctx.fillText(`Miss  : ${this.stats[this.level-1].miss}`, 10, 120);
+        ctx.fillText(`Hits  : ${this.stats[this.level-1].hits}`, 10, 100+40);
+        ctx.fillText(`Miss  : ${this.stats[this.level-1].miss}`, 10, 120+40);
     } else {
         console.error('Level or Stats are missing');
     }
 
-    ctx.fillText(`Time  : ${ (this.time > 0 ? this.time : 0) }`, 10, 140);
+    ctx.fillText(`Time  : ${ (this.time > 0 ? this.time : 0) }`, 10, 140+40);
 };
 
 /**
  * Draw paused on user request
  */
-Game.prototype.drawPaused = function() {
+/*Game.prototype.drawPaused = function() {
     ctx.fillStyle = 'white';
     ctx.font = "5rem monospace";
     ctx.fillText('Paused', (this.width/2) - 145, this.height/2);
-};
+};*/
 
 /**
  * Draw the transitions between levels and game over
  */
-Game.prototype.drawTrans = function() {
+/*Game.prototype.drawTrans = function() {
 
     ctx.fillStyle = 'white';
     ctx.font = "3rem monospace";
@@ -240,16 +386,19 @@ Game.prototype.drawTrans = function() {
         }
 
     } else {
-        if (this.time === 0) {
+        this.navigate(5);
+        nextLevelCounter.innerHTML = (5 + this.time);
+
+        /!*if (this.time === 0) {
             ctx.fillText('TIMES UP!', (this.width/2)-130, this.height/2);
         } else if (this.time === -1) {
             ctx.fillText('GET READY', (this.width/2)-130, this.height/2);
         } else {
             ctx.fillText(`${5 + this.time}`, (this.width/2)-15, this.height/2);
-        }
+        }*!/
     }
 
-};
+};*/
 
 /**
  * Load the level of the game
@@ -266,14 +415,14 @@ Game.prototype.loadLevel = function (level) {
         this.stats.length = 0;
     }
 
-    this.stats.push({hits: 0, miss: 0});
+    this.stats[this.level-1] = {hits: 0, miss: 0};
 
     for (let i = 0; i < this.maxPuzzles; i++) {
         this.addPuzzle();
     }
 
-    if (this.status === 4) {
-        this.time = 60 + (30 * this.level);
+    if (this.status === this.PLAYING) {
+        this.time = 10; //60 + (30 * this.level);
         this.timer = setInterval(timeManager, 1000);
     }
 
@@ -340,8 +489,9 @@ Game.prototype.evaluate = function(rocks) {
             this.stats[this.level-1].miss++;
 
             if (this.stats[this.level-1].miss >= 6) {
-                this.gameover = true;
-                this.time = 0; // game over
+                this.navigate(this.GAMEOVER);
+                //this.gameover = true;
+                //this.time = 0; // game over
             } else {
                 // change the direction and spinning of the rock affected by the click
                 const decision = random(0, 2);
@@ -568,9 +718,7 @@ game.draw();
 canvas.addEventListener('click', click);
 function click() {
 
-    if (game.gameover) {
-        if (game.time < -1) game.loadLevel(1);
-    } else if (!game.timesup) {
+    if (game.status === game.PLAYING) {
         const hits = [];
 
         for (const puzzle of game.puzzles) {
@@ -601,24 +749,20 @@ function updateCursor(e) {
     game.cursor.y = e.clientY * scaleY;
 }
 
-// Pause controller
+// Save controller
+const btSave = document.getElementById('btSave');
 
+// Pause controller
 const btPause = document.getElementById('btPause');
 btPause.addEventListener('click', togglePause);
 function togglePause() {
 
-    game.paused = !game.paused;
-
-    if (game.paused) {
-        btPause.classList.add("fa-play");
-        btPause.classList.remove("fa-pause");
+    if (game.status === game.PLAYING) {
+        game.navigate(game.PAUSED);
     } else {
-        btPause.classList.add("fa-pause");
-        btPause.classList.remove("fa-play");
-        requestAnimationFrame( function () {
-            game.draw();
-        });
+        game.navigate(game.PLAYING);
     }
+
 }
 
 // Sound effects controller
