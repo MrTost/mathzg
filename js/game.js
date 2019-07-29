@@ -464,6 +464,8 @@ Game.prototype.resume = function () {
         this.player = JSON.parse(localStorage.getItem('save'));
         this.level = this.player.stats.length;
         this.navigate(this.PLAYING, true);
+        toggleFX(false);
+        toggleMusic(false);
     }
 };
 
@@ -742,9 +744,9 @@ function togglePause() {
 
 // Sound effects controller
 btAudioFX.addEventListener('click', toggleFX);
-function toggleFX() {
+function toggleFX(toggle = true) {
 
-    game.player.playFX = !game.player.playFX;
+    if (toggle) game.player.playFX = !game.player.playFX;
 
     if (game.player.playFX) {
         btAudioFX.classList.add("fa-volume-up");
@@ -757,9 +759,9 @@ function toggleFX() {
 
 // Music controller
 btAudioMusic.addEventListener('click', toggleMusic);
-function toggleMusic() {
+function toggleMusic(toggle = true) {
 
-    game.player.playMusic = !game.player.playMusic;
+    if (toggle) game.player.playMusic = !game.player.playMusic;
 
     if (game.player.playMusic) {
         btAudioMusicMuter.style.display="none";

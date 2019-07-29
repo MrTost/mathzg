@@ -2,7 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2ee39844-63a9-4139-803c-e62527e2c1e7" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/css/index.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/css/player.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/css/rules.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/js/game.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/game.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/player.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rules.html" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -76,7 +84,7 @@
       <workItem from="1563999331842" duration="1563000" />
       <workItem from="1564240339736" duration="1387000" />
       <workItem from="1564279437249" duration="9778000" />
-      <workItem from="1564330036993" duration="25328000" />
+      <workItem from="1564330036993" duration="26160000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <created>1563279590131</created>
@@ -176,7 +184,14 @@
       <option name="project" value="LOCAL" />
       <updated>1564363358204</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="fix time and infinite loop">
+      <created>1564363908820</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1564363908820</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -207,6 +222,7 @@
     <MESSAGE value="fixing flip" />
     <MESSAGE value="implement better transitions" />
     <MESSAGE value="last implementations" />
-    <option name="LAST_COMMIT_MESSAGE" value="last implementations" />
+    <MESSAGE value="fix time and infinite loop" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix time and infinite loop" />
   </component>
 </project>
