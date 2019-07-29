@@ -2,9 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2ee39844-63a9-4139-803c-e62527e2c1e7" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/css/game.css" beforeDir="false" afterPath="$PROJECT_DIR$/css/game.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game.html" beforeDir="false" afterPath="$PROJECT_DIR$/game.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/js/game.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/game.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -79,7 +76,7 @@
       <workItem from="1563999331842" duration="1563000" />
       <workItem from="1564240339736" duration="1387000" />
       <workItem from="1564279437249" duration="9778000" />
-      <workItem from="1564330036993" duration="25012000" />
+      <workItem from="1564330036993" duration="25328000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <created>1563279590131</created>
@@ -172,7 +169,14 @@
       <option name="project" value="LOCAL" />
       <updated>1564340125955</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="last implementations">
+      <created>1564363358204</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1564363358204</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -202,6 +206,7 @@
     <MESSAGE value="adding game over on 6 misses" />
     <MESSAGE value="fixing flip" />
     <MESSAGE value="implement better transitions" />
-    <option name="LAST_COMMIT_MESSAGE" value="implement better transitions" />
+    <MESSAGE value="last implementations" />
+    <option name="LAST_COMMIT_MESSAGE" value="last implementations" />
   </component>
 </project>

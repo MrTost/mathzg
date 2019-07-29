@@ -348,7 +348,7 @@ Game.prototype.loadLevel = function (level, resume = false) {
     }
 
     if (this.status === this.PLAYING) {
-        if (!resume) this.player.time = 30; //60 + (30 * this.level);
+        if (!resume) this.player.time = 60 + (30 * this.level);
         this.timer = setInterval(timeManager, 1000);
     }
 
@@ -361,6 +361,7 @@ Game.prototype.addPuzzle = function() {
 
     let pz;
     let isUnique;
+    let i = 0;
 
     do {
         isUnique = true;
@@ -380,7 +381,9 @@ Game.prototype.addPuzzle = function() {
             }
         }
 
-    } while (!isUnique); // FIXME: implement break of max try (infinite loop for finite puzzles)
+        i++;
+
+    } while (!isUnique && i < 50); // limit of attempts to get a unique result (avoid infinite loop)
 
     this.puzzles.push(pz);
     this.puzzle = random(0, this.puzzles.length - 1); // set the new right answer
@@ -667,7 +670,7 @@ game.draw();
 inAge.addEventListener('keydown', onlyNumbers);
 function onlyNumbers(event) {
 
-    let key = event.key || event.keyCode;
+    let key = event.key || event.keyCode; // backwards compatibility
 
     if (key === 'Backspace'  || key === 'BS'     || key === 8  ||
         key === 'Tab'        || key === 'Tab'    || key === 9  ||
