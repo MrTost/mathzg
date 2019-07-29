@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Jua|Russo+One|Wendy+One&display=swap');
 
 .d-none {
-    display: none;
+    display: none !important;
 }
 
 .ad-b {
@@ -141,8 +141,16 @@
     align-content: center;*/
 }
 
-
-
+.btn-save {
+    box-shadow: inset 0 0 0 0 white;
+}
+.btn-saving {
+    -webkit-transition: box-shadow 1000ms ease-out 100ms;
+    -moz-transition: box-shadow 1000ms ease-out 100ms;
+    -o-transition: box-shadow 1000ms ease-out 100ms;
+    transition: box-shadow 1000ms linear 100ms;
+    box-shadow: inset 3rem 0 0 0 blue;
+}
 
 @media (max-width: 640px) {
     /*.container:after { content: 'layout 1'; position: absolute; top: 0; bottom: 0; left: 0; right: 0; }*/
@@ -317,9 +325,7 @@
     font-size: 1.5rem !important;
     font-weight: bold !important;
 }
-.btn-credits {
 
-}
 /* BOOTSTRAP */
 button,
 input {

@@ -1,8 +1,20 @@
+const regexNumbers = /[0-9]|\./;
+
+const btResume = document.getElementById('btResume');
+const btSave = document.getElementById('btSave');
+const btPause = document.getElementById('btPause');
+const btAudioFX = document.getElementById('btAudioFX');
+const btAudioMusicMuter = document.getElementById('btAudioMusicMuter');
+const btAudioMusic = document.getElementById('btAudioMusic');
+
 const gamePopup = document.getElementById('game-popup');
 const start = document.getElementById('start');
 const rules = document.getElementById('rules');
 const credits = document.getElementById('credits');
 const playerSelect = document.getElementById('player-select');
+
+const inName = document.getElementById('inName');
+const inAge = document.getElementById('inAge');
 
 const nextLevel = document.getElementById('next-level');
 const nextLevelCounter = document.getElementById('next-level-counter');
@@ -43,9 +55,9 @@ function timeManager() {
     //console.log('This is the timer: ', this.paused);
 
     if (game.status === game.PLAYING || game.status === game.NEXTLEVEL) {
-        game.time--;
+        game.player.time--;
 
-        if (game.time === 0) {
+        if (game.player.time === 0) {
             if (game.level >= game.maxLevels) {
                 game.navigate(game.GAMEEND);
             } else {
@@ -54,14 +66,39 @@ function timeManager() {
         }
 
         if (game.status === game.NEXTLEVEL) {
-            nextLevelCounter.innerHTML = (5 + game.time);
+            nextLevelCounter.innerHTML = (5 + game.player.time);
 
-            if (game.time <= -5) {
+            if (game.player.time <= -5) {
                 game.navigate(game.PLAYING);
             }
         }
     }
 
+}
+
+function isStorageAvailable(type) {
+    let storage;
+    try {
+        storage = window[type];
+        let x = '__storage_test__';
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+    }
+    catch(e) {
+        return e instanceof DOMException && (
+                // everything except Firefox
+            e.code === 22 ||
+            // Firefox
+            e.code === 1014 ||
+            // test name field too, because code might not be present
+            // everything except Firefox
+            e.name === 'QuotaExceededError' ||
+            // Firefox
+            e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+            // acknowledge QuotaExceededError only if there's something already stored
+            (storage && storage.length !== 0);
+    }
 }
 
 function Game() {
@@ -82,20 +119,20 @@ function Game() {
     this.status = this.GAMESTART;
 
     this.player = {
-        name: null,
+        name: 'Me',
         age: null,
         playMusic: false,
         playFX: true,
-        history: []
+        time: 0,
+        score: 0,
+        stats: []
     };
 
     this.maxLevels = 3;
 
-    this.time = 0;
     this.timer = null;
 
-    this.score = 0;  // Score of all levels combined
-    this.stats = []; // hits and miss for each level, also controls the chain of levels
+    //this.stats = []; // hits and miss for each level, also controls the chain of levels
 
     this.maxPuzzles = 9; // number of rocks bouncing on the screen
     this.puzzle = null; // index of the right answer
@@ -107,197 +144,127 @@ function Game() {
     this.toleance = 5;
 }
 
+Game.prototype.killTimer = function() {
+    clearInterval(this.timer); // remove timer
+    this.timer = null;
+};
+
 /**
  * Reset the game
  */
-Game.prototype.reset = function() {
+Game.prototype.reset = function(resume = false) {
+
+    this.killTimer();
     this.puzzles.length = 0; // clear the array of puzzles
-    this.time = 0;
-    this.timer = null;
+    if (!resume) this.player.time = 0;
+
 };
 
 /**
  * Game navigation system
  * @param status pages to display [0-4]
+ * @param resume
  */
-Game.prototype.navigate = function (status) {
+Game.prototype.navigate = function (status, resume = false) {
 
-    let loadLevel = true;
-    if (this.status === this.PAUSED) loadLevel = false;
+    if (this.status === this.PLAYERNAME) {
+        if (inName.value) {
+            this.player.name = inName.value;
+        }
 
-    if (status === this.PLAYAGAIN) {
+        if (inAge.value) {
+            this.player.age = parseInt(inAge.value);
+        }
+    }
+
+    if (status === this.PLAYAGAIN || status === this.TRYAGAIN) {
         this.status = this.PLAYING;
         this.reset();
-        this.level = 1;
-    } else if (status === this.TRYAGAIN) {
-        this.status = this.PLAYING;
-        this.reset();
+        if (status === this.PLAYAGAIN) this.level = 1;
     } else {
         this.status = status;
     }
 
-    if (this.status === this.GAMEEND) {
-        console.log('GAME END');
-
-        clearInterval(this.timer);
-
+    if (this.status !== this.PLAYING) {
+        if (this.status !== this.NEXTLEVEL) this.killTimer();
         gamePopup.classList.remove('d-none');
-        start.classList.add('d-none');
-        rules.classList.add('d-none');
-        credits.classList.add('d-none');
-        playerSelect.classList.add('d-none');
         gamePopup.style.zIndex = '0';
-        nextLevel.classList.add('d-none');
-        gameOver.classList.add('d-none');
-        gameEnd.classList.remove('d-none');
-        paused.classList.add('d-none');
+    }
 
-        btPause.classList.add('d-none');
-        btSave.classList.add('d-none');
+    start.classList.add('d-none');
+    rules.classList.add('d-none');
+    credits.classList.add('d-none');
+    playerSelect.classList.add('d-none');
+    nextLevel.classList.add('d-none');
+    gameOver.classList.add('d-none');
+    gameEnd.classList.add('d-none');
+    paused.classList.add('d-none');
+    btPause.classList.add('d-none');
+    btSave.classList.add('d-none');
+    btResume.classList.add('d-none');
+
+    if (this.status === this.GAMEEND) {
+        //console.log('GAME END');
+        const score = document.getElementById('score');
+        score.innerText = this.player.score;
+
+        gameEnd.classList.remove('d-none');
 
     } else if (this.status === this.GAMEOVER) {
-        console.log('GAME OVER');
-
-        clearInterval(this.timer);
-
-        gamePopup.classList.remove('d-none');
-        start.classList.add('d-none');
-        rules.classList.add('d-none');
-        credits.classList.add('d-none');
-        playerSelect.classList.add('d-none');
-        gamePopup.style.zIndex = '0';
-        nextLevel.classList.add('d-none');
+        //console.log('GAME OVER');
         gameOver.classList.remove('d-none');
-        gameEnd.classList.add('d-none');
-        paused.classList.add('d-none');
-
-        btPause.classList.add('d-none');
-        btSave.classList.add('d-none');
 
     } else if (this.status === this.NEXTLEVEL) {
-        console.log('NEXT LEVEL');
+        //console.log('NEXT LEVEL');
 
         this.level++;
-
-        gamePopup.classList.remove('d-none');
-        start.classList.add('d-none');
-        rules.classList.add('d-none');
-        credits.classList.add('d-none');
-        playerSelect.classList.add('d-none');
-        gamePopup.style.zIndex = '0';
         nextLevel.classList.remove('d-none');
-        gameOver.classList.add('d-none');
-        gameEnd.classList.add('d-none');
-        paused.classList.add('d-none');
-
-        btPause.classList.add('d-none');
-        btSave.classList.add('d-none');
 
     } else if (this.status === this.PAUSED) {
-        console.log('PAUSED');
+        //console.log('PAUSED');
 
         btPause.classList.add("fa-play");
         btPause.classList.remove("fa-pause");
 
-        gamePopup.classList.remove('d-none');
-        start.classList.add('d-none');
-        rules.classList.add('d-none');
-        credits.classList.add('d-none');
-        playerSelect.classList.add('d-none');
-        gamePopup.style.zIndex = '0';
-        nextLevel.classList.add('d-none');
-        gameOver.classList.add('d-none');
-        gameEnd.classList.add('d-none');
         paused.classList.remove('d-none');
 
         btPause.classList.remove('d-none');
         btSave.classList.remove('d-none');
 
     } else if (this.status === this.PLAYING) {
-        console.log('PLAYING');
-
-        if (loadLevel) clearInterval(this.timer);
+        //console.log('PLAYING');
 
         gamePopup.classList.add('d-none');
-        start.classList.add('d-none');
-        rules.classList.add('d-none');
-        credits.classList.add('d-none');
-        playerSelect.classList.add('d-none');
         gamePopup.style.zIndex = '-1';
-        nextLevel.classList.add('d-none');
-        gameOver.classList.add('d-none');
-        gameEnd.classList.add('d-none');
-        paused.classList.add('d-none');
 
         btPause.classList.add("fa-pause");
         btPause.classList.remove("fa-play", "d-none");
         btSave.classList.remove('d-none');
 
-        if (loadLevel) this.loadLevel(this.level);
+        this.loadLevel(this.level, resume);
 
     } else if (this.status === this.GAMESTART) {
-        console.log('GAME START');
+        //console.log('GAME START');
 
-        gamePopup.classList.remove('d-none');
         start.classList.remove('d-none');
-        rules.classList.add('d-none');
-        credits.classList.add('d-none');
-        playerSelect.classList.add('d-none');
-        nextLevel.classList.add('d-none');
-        gameOver.classList.add('d-none');
-        gameEnd.classList.add('d-none');
-        paused.classList.add('d-none');
-
-        btPause.classList.add('d-none');
-        btSave.classList.add('d-none');
 
     } else if (this.status === this.PLAYERNAME) {
-        console.log('PLAYER NAME');
+        //console.log('PLAYER NAME');
 
-        gamePopup.classList.remove('d-none');
-        start.classList.add('d-none');
-        rules.classList.add('d-none');
-        credits.classList.add('d-none');
+        if (this.hasSave()) {
+            btResume.classList.remove('d-none');
+        }
         playerSelect.classList.remove('d-none');
-        nextLevel.classList.add('d-none');
-        gameOver.classList.add('d-none');
-        gameEnd.classList.add('d-none');
-        paused.classList.add('d-none');
-
-        btPause.classList.add('d-none');
-        btSave.classList.add('d-none');
 
     } else if (this.status === this.RULES) {
-        console.log('RULES');
+        //console.log('RULES');
 
-        gamePopup.classList.remove('d-none');
-        start.classList.add('d-none');
         rules.classList.remove('d-none');
-        credits.classList.add('d-none');
-        playerSelect.classList.add('d-none');
-        nextLevel.classList.add('d-none');
-        gameOver.classList.add('d-none');
-        gameEnd.classList.add('d-none');
-        paused.classList.add('d-none');
-
-        btPause.classList.add('d-none');
-        btSave.classList.add('d-none');
 
     } else if (this.status === this.CREDITS) {
-        console.log('go to credits');
+        //console.log('go to credits');
 
-        gamePopup.classList.remove('d-none');
-        start.classList.add('d-none');
-        rules.classList.add('d-none');
         credits.classList.remove('d-none');
-        playerSelect.classList.add('d-none');
-        nextLevel.classList.add('d-none');
-        gameOver.classList.add('d-none');
-        gameEnd.classList.add('d-none');
-        paused.classList.add('d-none');
-
-        btPause.classList.add('d-none');
-        btSave.classList.add('d-none');
 
     } else {
         console.error('STATUS NOT FOUND');
@@ -348,81 +315,40 @@ Game.prototype.drawStats = function() {
 
     ctx.font = "1rem monospace";
     ctx.fillText(`Player: ${this.player.name}`, 10, 60+40);
-    ctx.fillText(`Score : ${this.score}`, 10, 80+40);
+    ctx.fillText(`Score : ${(this.player.score < 0 ? 0 : this.player.score)}`, 10, 80+40);
 
-    if (this.level && this.stats && this.stats.length) {
-        ctx.fillText(`Hits  : ${this.stats[this.level-1].hits}`, 10, 100+40);
-        ctx.fillText(`Miss  : ${this.stats[this.level-1].miss}`, 10, 120+40);
+    if (this.level && this.player.stats && this.player.stats.length) {
+        ctx.fillText(`Hits  : ${this.player.stats[this.level-1].hits}`, 10, 100+40);
+        ctx.fillText(`Miss  : ${this.player.stats[this.level-1].miss}`, 10, 120+40);
     } else {
         console.error('Level or Stats are missing');
     }
 
-    ctx.fillText(`Time  : ${ (this.time > 0 ? this.time : 0) }`, 10, 140+40);
+    ctx.fillText(`Time  : ${ (this.player.time > 0 ? this.player.time : 0) }`, 10, 140+40);
 };
-
-/**
- * Draw paused on user request
- */
-/*Game.prototype.drawPaused = function() {
-    ctx.fillStyle = 'white';
-    ctx.font = "5rem monospace";
-    ctx.fillText('Paused', (this.width/2) - 145, this.height/2);
-};*/
-
-/**
- * Draw the transitions between levels and game over
- */
-/*Game.prototype.drawTrans = function() {
-
-    ctx.fillStyle = 'white';
-    ctx.font = "3rem monospace";
-
-    if (this.gameover) {
-        ctx.fillText('GAME OVER', (this.width/2)-130, this.height/2);
-
-        if (this.time < -1) {
-            ctx.font = "2rem monospace";
-            ctx.fillText('click to retry', (this.width/2)-135, (this.height/2) + 40);
-        }
-
-    } else {
-        this.navigate(5);
-        nextLevelCounter.innerHTML = (5 + this.time);
-
-        /!*if (this.time === 0) {
-            ctx.fillText('TIMES UP!', (this.width/2)-130, this.height/2);
-        } else if (this.time === -1) {
-            ctx.fillText('GET READY', (this.width/2)-130, this.height/2);
-        } else {
-            ctx.fillText(`${5 + this.time}`, (this.width/2)-15, this.height/2);
-        }*!/
-    }
-
-};*/
 
 /**
  * Load the level of the game
  * @param level number of the level 1 to 3
+ * @param resume
  */
-Game.prototype.loadLevel = function (level) {
+Game.prototype.loadLevel = function (level, resume = false) {
 
-    clearInterval(this.timer);
-    this.reset();
+    this.reset(resume);
+
     this.level = level;
 
-    if (this.level === 1) {
-        this.score = 0;
-        this.stats.length = 0;
+    if (!resume) {
+        if (this.level === 1) this.player.stats.length = 0;
+        this.player.stats[this.level-1] = {hits: 0, miss: 0};
     }
-
-    this.stats[this.level-1] = {hits: 0, miss: 0};
 
     for (let i = 0; i < this.maxPuzzles; i++) {
         this.addPuzzle();
     }
 
     if (this.status === this.PLAYING) {
-        this.time = 10; //60 + (30 * this.level);
+        if (!resume) this.player.time = 30; //60 + (30 * this.level);
         this.timer = setInterval(timeManager, 1000);
     }
 
@@ -474,8 +400,8 @@ Game.prototype.evaluate = function(rocks) {
         for (const rock of rocks) {
             if (rock.result === this.puzzles[this.puzzle].r) {
                 if (this.player.playFX) audioRight.play().then(function (r) {});
-                this.stats[this.level-1].hits++;
-                this.score++;
+                this.player.score++;
+                this.player.stats[this.level-1].hits++;
                 this.puzzles.splice(this.puzzle, 1); // remove from the array
                 this.addPuzzle();
                 wrong = false;
@@ -485,13 +411,11 @@ Game.prototype.evaluate = function(rocks) {
 
         if (wrong) {
             if (this.player.playFX) audioWrong.play().then(function (r) {});
-            this.score -= (this.score - 1 < 0 ? 0 : 1);
-            this.stats[this.level-1].miss++;
+            this.player.score -= (this.player.score -1 < 0 ? 0 : 1);
+            this.player.stats[this.level-1].miss++;
 
-            if (this.stats[this.level-1].miss >= 6) {
+            if (this.player.stats[this.level-1].miss >= 6) {
                 this.navigate(this.GAMEOVER);
-                //this.gameover = true;
-                //this.time = 0; // game over
             } else {
                 // change the direction and spinning of the rock affected by the click
                 const decision = random(0, 2);
@@ -513,6 +437,31 @@ Game.prototype.evaluate = function(rocks) {
         }
     }
 
+};
+
+Game.prototype.save = function () {
+
+    btSave.classList.add('btn-saving');
+
+    if (isStorageAvailable('localStorage')) {
+        localStorage.setItem('save', JSON.stringify(this.player));
+    }
+
+    window.setTimeout(function () {
+        btSave.classList.remove('btn-saving');
+    }, 1000); // same time as the transition
+};
+
+Game.prototype.hasSave = function() {
+    return (isStorageAvailable('localStorage') && localStorage.getItem('save'));
+};
+
+Game.prototype.resume = function () {
+    if (this.hasSave()) {
+        this.player = JSON.parse(localStorage.getItem('save'));
+        this.level = this.player.stats.length;
+        this.navigate(this.PLAYING, true);
+    }
 };
 
 /**
@@ -715,6 +664,31 @@ game.draw();
 
 // Events --------------------------------------------------------------------------------------------------------------
 
+inAge.addEventListener('keydown', onlyNumbers);
+function onlyNumbers(event) {
+
+    let key = event.key || event.keyCode;
+
+    if (key === 'Backspace'  || key === 'BS'     || key === 8  ||
+        key === 'Tab'        || key === 'Tab'    || key === 9  ||
+        key === 'Enter'      || key === 'Return' || key === 13 ||
+        key === 'Escape'     || key === 'Esc'    || key === 27 ||
+        key === 'End'        || key === 'Del'    || key === 35 ||
+        key === 'Home'       || key === 'Del'    || key === 36 ||
+        key === 'ArrowLeft'  || key === 'Left'   || key === 37 ||
+        key === 'ArrowUp'    || key === 'Up'     || key === 38 ||
+        key === 'ArrowRight' || key === 'Right'  || key === 39 ||
+        key === 'ArrowDown'  || key === 'Down'   || key === 40 ||
+        key === 'Delete'     || key === 'Del'    || key === 46) {
+        // do nothing
+    } else {
+        if (!regexNumbers.test(key)) {
+            event.returnValue = false;
+            if(event.preventDefault) event.preventDefault();
+        }
+    }
+}
+
 canvas.addEventListener('click', click);
 function click() {
 
@@ -739,7 +713,7 @@ function click() {
 
 canvas.addEventListener("mousemove", updateCursor);
 function updateCursor(e) {
-    //console.log(e);
+
     const rect = canvas.getBoundingClientRect();
 
     const scaleX = (game.width / rect.width);
@@ -749,25 +723,21 @@ function updateCursor(e) {
     game.cursor.y = e.clientY * scaleY;
 }
 
-// Save controller
-const btSave = document.getElementById('btSave');
-
 // Pause controller
-const btPause = document.getElementById('btPause');
 btPause.addEventListener('click', togglePause);
 function togglePause() {
 
     if (game.status === game.PLAYING) {
         game.navigate(game.PAUSED);
+    } else if (game.status === game.PAUSED) {
+        game.navigate(game.PLAYING, true);
     } else {
-        game.navigate(game.PLAYING);
+        console.error('NOT SUPPORTED');
     }
 
 }
 
 // Sound effects controller
-
-const btAudioFX = document.getElementById('btAudioFX');
 btAudioFX.addEventListener('click', toggleFX);
 function toggleFX() {
 
@@ -783,9 +753,6 @@ function toggleFX() {
 }
 
 // Music controller
-
-const btAudioMusicMuter = document.getElementById('btAudioMusicMuter');
-const btAudioMusic = document.getElementById('btAudioMusic');
 btAudioMusic.addEventListener('click', toggleMusic);
 function toggleMusic() {
 
@@ -801,7 +768,6 @@ function toggleMusic() {
 }
 
 // Resize or flip
-
 //window.addEventListener('onorientationchange', onResizeOrOnOrientationChange, false);
 window.addEventListener('resize', onResizeOrOnOrientationChange, false);
 function onResizeOrOnOrientationChange() {
