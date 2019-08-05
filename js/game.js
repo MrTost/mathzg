@@ -45,7 +45,7 @@ audioBackground.loop = true;
 
 function random(min, max, dec = 0) {
     const power = Math.pow(10, dec);
-    return Math.floor((Math.random() * (max - min) + min) * power) / power;
+    return Math.floor((Math.random() * (max - min + 1) + min) * power) / power;
 }
 
 /**
@@ -551,7 +551,7 @@ function Rock(result) {
     this.y = random(0, game.height);
     this.size = random(rockMinSize, rockMaxSize);
     this.image = new Image(this.size, this.size);
-    this.image.src = `img/rock${random(2, 5)}.png`;
+    this.image.src = `img/stone-${random(1, 2)}-${random(1, 5)}.png`;
 
     this.loadVel();
     this.bound();
@@ -580,12 +580,12 @@ Rock.prototype.bound = function(flip = false) {
  */
 Rock.prototype.loadVel = function() {
     if (!this.velX || this.velX === 0) {
-        this.velX = random(-2, 2,1);
+        this.velX = random(-1, 1,1);
         this.velX += this.velFix(this.velX);
     }
 
     if (!this.velY || this.velY === 0) {
-        this.velY = random(-2, 2,1);
+        this.velY = random(-1, 1,1);
         this.velY += this.velFix(this.velY);
     }
 
