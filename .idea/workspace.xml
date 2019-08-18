@@ -2,10 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2ee39844-63a9-4139-803c-e62527e2c1e7" name="Default Changelist" comment="adding Travis CI - FIREBASE">
+      <change afterPath="$PROJECT_DIR$/css/index.css" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/docs/Report.docx" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/docs/Report.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/css/game.css" beforeDir="false" afterPath="$PROJECT_DIR$/css/game.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/js/game.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/game.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -92,7 +95,7 @@
       <workItem from="1565022723963" duration="6683000" />
       <workItem from="1565216425756" duration="15000" />
       <workItem from="1565732080654" duration="1392000" />
-      <workItem from="1566057722841" duration="2651000" />
+      <workItem from="1566057722841" duration="8607000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <created>1563279590131</created>
@@ -262,7 +265,21 @@
       <option name="project" value="LOCAL" />
       <updated>1566062555871</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="adding build badge">
+      <created>1566062825823</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1566062825823</updated>
+    </task>
+    <task id="LOCAL-00026" summary="adding adsense">
+      <created>1566143985820</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1566143985820</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -301,6 +318,8 @@
     <MESSAGE value="adding Travis CI" />
     <MESSAGE value="adding Travis CI - FIREBASE" />
     <MESSAGE value="fix url facebook share button" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix url facebook share button" />
+    <MESSAGE value="adding build badge" />
+    <MESSAGE value="adding adsense" />
+    <option name="LAST_COMMIT_MESSAGE" value="adding adsense" />
   </component>
 </project>

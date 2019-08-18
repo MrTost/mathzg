@@ -22,7 +22,7 @@ const gameOver = document.getElementById('game-over');
 const gameEnd = document.getElementById('game-end');
 const paused = document.getElementById('paused');
 
-const canvas = document.querySelector('canvas');
+const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 
 // Images
